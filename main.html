@@ -1,0 +1,630 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>¡Adivina la Canción!</title>
+<style>
+  :root{
+    --accent:#ce265b;
+    --panel: rgba(255,255,255,0.92);
+    --glass: rgba(255,255,255,0.08);
+    --font-sans: "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    --bg-dark: rgba(0,0,0,0.5);
+  }
+
+  html,body{ height:100%; 
+    margin:0; 
+    font-family:var(--font-sans); 
+    background:url('backgroundmusic.png') center/cover no-repeat fixed; 
+    color:#111; }
+
+  .app{ min-height:100vh; 
+    display:flex; 
+    align-items:center; 
+    justify-content:center; 
+    padding:20px; 
+    box-sizing:border-box; }
+
+  .card{ width:100%; 
+    max-width:1070px; 
+    min-height:620px; 
+    background: linear-gradient(180deg, #dc4646, #9d6a94); 
+    border-radius:14px; 
+    box-shadow: 0 12px 30px rgba(0,0,0,0.25); 
+    overflow:hidden; position:relative; 
+    display:flex; flex-direction:column; }
+
+  header.app-header{ padding:18px 28px; 
+    display:flex; 
+    align-items:center; 
+    justify-content:center; 
+    font-size:28px; 
+    font-weight:700; }
+
+  .scoreboard{ position:absolute; 
+    top:12px; 
+    left:12px; 
+    background:var(--glass); 
+    color:#953553; 
+    backdrop-filter: blur(6px); 
+    padding:10px 14px; 
+    border-radius:12px; 
+    font-weight:700; 
+    box-shadow:0 6px 14px rgba(0,0,0,0.25); 
+    z-index:30; }
+
+  .app-main{ display:grid; 
+    place-items:center; 
+    padding:28px; 
+    flex:1; 
+    position:relative; }
+
+  .home .hero{ width:100%; 
+    height:100%; 
+    border-radius:12px; 
+    background:url('startpage.jpg') center/cover no-repeat; 
+    box-shadow: inset 0 0 0 1000px rgba(0,0,0,0.22); 
+    display:flex; 
+    align-items:center; 
+    justify-content:center; 
+    flex-direction:column; 
+    gap:18px; 
+    padding:20px; 
+    color:#953553; }
+
+  .start-btn{ background:linear-gradient(180deg,var(--accent),#953553); 
+    color:white; 
+    padding:18px 36px; 
+    border-radius:999px; 
+    font-size:20px; 
+    font-weight:700; 
+    border:none; cursor:pointer; 
+    box-shadow:0 8px 20px rgba(255,77,109,0.25); }
+
+  .chooser{ width:100%; height:100%; 
+    display:flex; gap:18px; padding:20px; 
+    box-sizing:border-box; }
+
+  .left{ flex:1 1 520px; display:flex; 
+    flex-direction:column; gap:14px; align-items:center; 
+    justify-content:flex-start; }
+
+  .songs-grid{ display:grid; grid-template-columns: repeat(2, 1fr); 
+    gap:14px; width:100%; }
+
+  .song-btn{ display:flex; align-items:center; 
+    justify-content:center; flex-direction:column; 
+    gap:6px; padding:18px; border-radius:999px; 
+    background:linear-gradient(180deg, rgba(255,255,255,0.88), rgba(240,240,240,0.88)); 
+    border:6px solid rgba(255,255,255,0.6); 
+    cursor:pointer; transition: transform .12s, box-shadow .12s; 
+    min-height:110px; 
+    text-align:center; }
+
+  .song-btn:hover{ transform:translateY(-6px) scale(1.02); 
+  
+    box-shadow:0 14px 30px rgba(0,0,0,0.18); }
+  .chooser .preview{ width:320px; height:260px; 
+    border-radius:12px; 
+    background:url('startpage.jpg') center/cover no-repeat; 
+    box-shadow: inset 0 0 0 1000px rgba(0,0,0,0.25); 
+    display:flex; align-items:center; justify-content:center; 
+    color:#fff; font-size:16px; font-weight:700; }
+
+  .guess-screen{ width:100%; height:100%; 
+    border-radius:6px; position:relative; overflow:hidden; }
+
+  .guess-screen .bg{ position:absolute; inset:0; 
+    background-size:cover; background-position:center; 
+    filter:brightness(0.6); z-index:0; }
+
+  .guess-screen .content{ position:relative; 
+    z-index:2; height:100%; display:flex; 
+    flex-direction:column; gap:14px; padding:28px; 
+    box-sizing:border-box; align-items:center; 
+    justify-content:center; color:#C21E56; 
+    text-align:center; }
+
+  .play-btn{ margin-top:6px; 
+    background:rgba(255,255,255,0.95); color:#111; 
+    padding:14px 28px; font-weight:700; border-radius:12px; 
+    cursor:pointer; border:none; }
+
+  .countdown-img{ width:180px; 
+    height:180px; background-size:contain; 
+    background-repeat:no-repeat; 
+    background-position:center; margin-top:18px; }
+
+  .lyrics-box{ width:80%; max-width:760px; 
+    min-height:140px; 
+    background: rgba(255,255,255,0.92); color:#111; 
+    border-radius:12px; padding:16px 18px; 
+    box-sizing:border-box; font-weight:600; 
+    box-shadow:0 8px 24px rgba(0,0,0,0.25); 
+    display:flex; flex-direction:column; gap:8px; 
+    align-items:center; justify-content:center; color:#111; }
+
+  .lyric-line{ font-size:20px; 
+    opacity:0.95; text-align:center; 
+    min-height:28px; }
+
+  .guess-panel{ display:flex; 
+    gap:10px; margin-top:10px; align-items:center; 
+    justify-content:center; }
+
+  .guess-input{ padding:10px 12px; 
+    border-radius:8px; border:2px solid rgba(0,0,0,0.08); 
+    width:360px; font-size:16px; box-sizing:border-box; }
+
+  .guess-submit{ padding:10px 14px; border-radius:8px; 
+    background:var(--accent); color:white; font-weight:700; 
+    border:none; cursor:pointer; }
+
+  .small-btn{ padding:8px 12px; border-radius:8px; 
+    background:rgba(255,255,255,0.9); border:none; 
+    cursor:pointer; }
+
+  .message{ margin-top:8px; font-weight:700; 
+    color:#fff; }
+
+  .final{ display:flex; 
+    flex-direction:column; 
+    align-items:center; 
+    justify-content:center; 
+    background: url('gameoverpage.jpg') center/cover no-repeat;
+    gap:12px; 
+    width:100%; 
+    height:100%; }
+
+  .final h1{ font-size:48px; margin:0; }
+
+  .final p{ font-size:18px; margin:0; }
+
+  footer.app-footer{ padding:14px 18px; display:flex; 
+    justify-content:center; gap:12px; 
+    border-top:1px solid rgba(0,0,0,0.03); 
+    align-items:center; }
+
+  @media (max-width:900px){ 
+    .chooser{ flex-direction:column; } 
+  .songs-grid{ grid-template-columns: repeat(2, 1fr);} 
+  .chooser .preview{ width:100%; height:180px;} 
+  .lyrics-box{ width:92%; } }
+  @media (max-width:520px)
+  { .song-btn{ min-height:90px; padding:12px; } 
+  .scoreboard{ display:none; } .guess-input{ width:220px; } }
+
+</style>
+</head>
+<body>
+  <div class="app">
+    <div class="card" role="application" aria-label="Guess The Song game">
+      <div class="scoreboard" id="scoreboard" aria-live="polite">Puntaje: <b id="score">0</b> | <span id="songIndex">0/0</span></div>
+      <header class="app-header" id="pageHeader">¡Adivina la canción!</header>
+      <main class="app-main" id="mainArea">
+        <!-- Home -->
+        <section class="home" id="homeScreen">
+          <div class="hero">
+            <h1 style="color:white;font-size:48px;margin:0;text-shadow:0 8px 24px rgba(0,0,0,0.6)">¡Adivina la canción!</h1>
+            <p style="color:white;opacity:0.95;font-weight:700">¡Escucha con atención! ¡Adivina el nombre correcto de la canción para ganar puntos!</p>
+            <button class="start-btn" id="startBtn">Empezar</button>
+          </div>
+        </section>
+
+        <!-- Choose -->
+        <section class="chooser" id="chooseScreen" style="display:none">
+          <div class="left">
+            <h2 style="margin:0;">Elige una Canción</h2>
+            <p style="margin:0;color:#333">Elige cualquier canción para empezar. Tras seleccionar una, se iniciará una cola de juego de 5 canciones. La primera canción que elijas es un premio gratuito. Necesitas al menos 40 puntos para ganar.</p>
+            <div class="songs-grid" id="songsGrid" aria-label="Available songs">
+              <!-- buttons added by JS -->
+            </div>
+          </div>
+          <div class="right">
+            <div class="preview" id="chooserPreview">Área de vista previa</div>
+          </div>
+        </section>
+
+        <!-- Guess screen -->
+        <section class="guess-screen" id="guessScreen" style="display:none">
+          <div class="bg" id="guessBg"></div>
+          <div class="content" id="guessContent">
+            <h2 id="currentTitle">Canción</h2>
+            <button class="play-btn" id="playSongBtn">Jugar</button>
+
+            <div class="countdown-img" id="countdown" style="display:none"></div>
+
+            <div class="lyrics-box" id="lyricsBox" style="display:block">
+              <div class="lyric-line" id="lyricDisplay">Escucha el fragmento y luego adivina el título de la canción.</div>
+
+              <div id="questionArea" style="display:block">
+                <div style="font-weight:800;margin-top:6px">¿Cuál es la canción?</div>
+                <div class="guess-panel">
+                  <input class="guess-input" id="guessInput" autocomplete="off" placeholder="Type the song title here..."/>
+                  <button class="guess-submit" id="guessSubmit">Entregar</button>
+                  <button class="small-btn" id="replayBtn">Reproducir Clip</button>
+                </div>
+                <div class="message" id="messageArea"></div>
+                <div style="margin-top:6px;font-size:12px;opacity:0.85">Intentos restantes: <span id="triesLeft">3</span></div>
+              </div>
+            </div>
+
+            <audio id="audioPlayer"></audio>
+          </div>
+        </section>
+
+        <!-- Final -->
+        <section class="final" id="finalScreen" style="display:none">
+          <h1 id="finalTitle">¡Ganaste!</h1>
+          <p id="finalMessage">¡Tienes una memoria estupenda y un gusto musical excelente!</p>
+          <button class="start-btn" id="playAgainBtn">Jugar de Nuevo</button>
+        </section>
+      </main>
+
+      <footer class="app-footer">
+        <small style="color:#666">Adivina la canción.</small>
+      </footer>
+    </div>
+  </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', ()=>{
+
+/* ----------------------------
+   Data: Replace file paths/titles with real ones
+   ---------------------------- */
+const SONGS = [
+  { id: 's1', file: 'songuno.mp3', title: 'Tití Me Preguntó', artist: 'Bad Bunny', backgroundImage: 'guesspage1.jpg' },
+  { id: 's2', file: 'songdos.mp3', title: 'Como La Flor', artist: 'Selena', backgroundImage: 'guesspage2.jpg' },
+  { id: 's3', file: 'songtres.mp3', title: 'Chantaje', artist: 'Shakira', backgroundImage: 'guesspage1.jpg' },
+  { id: 's4', file: 'songcuatro.mp3', title: 'Corazón Sin Cara', artist: 'Prince Royce', backgroundImage: 'guesspage2.jpg' },
+  { id: 's5', file: 'songcinco.mp3', title: 'Bailando', artist: 'Enrique Iglesias', backgroundImage: 'guesspage1.jpg' },
+  { id: 's6', file: 'songseis.mp3', title: 'Propuesta Indecente', artist: 'Romeo Santos', backgroundImage: 'guesspage2.jpg' },
+  { id: 's7', file: 'songsiete.mp3', title: 'X Si Volvemos', artist: 'Karol G & Romeo Santos', backgroundImage: 'guesspage1.jpg' },
+  { id: 's8', file: 'songocho.mp3', title: 'Ella Quiere Beber', artist: 'Anuel AA & Romeo Santos', backgroundImage: 'guesspage2.jpg' },
+  { id: 's9', file: 'songnueve.mp3', title: 'Muchacha', artist: 'Becky G & Gente De Zona', backgroundImage: 'guesspage1.jpg' },
+  { id: 's10', file: 'songdiez.mp3', title: 'Nuevayol', artist: 'Bad Bunny', backgroundImage: 'guesspage2.jpg' }
+];
+
+/* ---------- GAME STATE ---------- */
+let state = {
+  score: 0,
+  queue: [],          // array of song objects (5 items)
+  currentIndex: 0,    // index in queue (0..4)
+  attempt: 1,         // 1..3 (which attempt user is on for current song)
+  totalSongsToPlay: 5,
+  countdownPlaying: false,
+  countdownTimeouts: [],
+  segmentTimeout: null,
+  nextSongTimeout: null
+};
+
+/* ---------- ELEMENTS ---------- */
+const pageHeader = document.getElementById('pageHeader');
+const homeScreen = document.getElementById('homeScreen');
+const startBtn = document.getElementById('startBtn');
+
+const chooseScreen = document.getElementById('chooseScreen');
+const songsGrid = document.getElementById('songsGrid');
+const chooserPreview = document.getElementById('chooserPreview');
+
+const guessScreen = document.getElementById('guessScreen');
+const guessBg = document.getElementById('guessBg');
+const currentTitle = document.getElementById('currentTitle');
+const playSongBtn = document.getElementById('playSongBtn');
+const countdownDiv = document.getElementById('countdown');
+const lyricsBox = document.getElementById('lyricsBox');
+const lyricDisplay = document.getElementById('lyricDisplay');
+const questionArea = document.getElementById('questionArea');
+const guessInput = document.getElementById('guessInput');
+const guessSubmit = document.getElementById('guessSubmit');
+const messageArea = document.getElementById('messageArea');
+const triesLeftSpan = document.getElementById('triesLeft');
+const audioPlayer = document.getElementById('audioPlayer');
+const replayBtn = document.getElementById('replayBtn');
+
+const finalScreen = document.getElementById('finalScreen');
+const finalTitle = document.getElementById('finalTitle');
+const finalMessage = document.getElementById('finalMessage');
+const playAgainBtn = document.getElementById('playAgainBtn');
+
+const scoreEl = document.getElementById('score');
+const songIndexEl = document.getElementById('songIndex');
+
+/* ---------- Initialization ---------- */
+function initChooser(){
+  songsGrid.innerHTML = '';
+  SONGS.forEach((s, idx)=>{
+    const btn = document.createElement('button');
+    btn.className = 'song-btn';
+    btn.innerHTML = `<div class="song-title">${s.title}</div><div class="song-artist">${s.artist}</div>`;
+    btn.onclick = ()=> onSongChosen(s);
+    btn.onmouseover = ()=> chooserPreview.style.backgroundImage = `url('${s.backgroundImage || 'startpage.jpg'}')`;
+    btn.onmouseleave = ()=> chooserPreview.style.backgroundImage = `url('startpage.jpg')`;
+    songsGrid.appendChild(btn);
+  });
+}
+initChooser();
+updateScoreboard();
+
+/* ---------- UI SWITCHERS ---------- */
+startBtn.addEventListener('click', ()=> showChooseScreen());
+playAgainBtn.addEventListener('click', restartGame);
+
+function showChooseScreen(){
+  homeScreen.style.display='none';
+  chooseScreen.style.display='flex';
+  guessScreen.style.display='none';
+  finalScreen.style.display='none';
+  pageHeader.textContent = 'Elige una Canción';
+}
+
+function showGuessScreen(){
+  homeScreen.style.display='none';
+  chooseScreen.style.display='none';
+  guessScreen.style.display='block';
+  finalScreen.style.display='none';
+  updateScoreboard();
+}
+
+function showFinalScreen(){
+  homeScreen.style.display='none';
+  chooseScreen.style.display='none';
+  guessScreen.style.display='none';
+  finalScreen.style.display='flex';
+  pageHeader.textContent = 'Resultados';
+}
+
+/* ---------- Build queue when user picks a song ---------- */
+function onSongChosen(selectedSong){
+  // build queue: chosen + 4 random other distinct songs
+  const others = SONGS.filter(s=> s.id !== selectedSong.id);
+  shuffleArray(others);
+  const queue = [selectedSong, ...others.slice(0, state.totalSongsToPlay - 1)];
+  state.queue = queue;
+  state.currentIndex = 0;
+  state.score = 0;
+  state.attempt = 1;
+  clearTimers();
+  pageHeader.textContent = 'Listo Para Jugar';
+  updateScoreboard();
+  showNextSongIntro();
+}
+
+function showNextSongIntro(){
+  showGuessScreen();
+  const song = state.queue[state.currentIndex];
+  if(!song) return;
+  currentTitle.textContent = `Canción ${state.currentIndex+1} — ???`;
+  const bgUrl = song.backgroundImage || 'guesspage1.jpg';
+  guessBg.style.backgroundImage = `url('${bgUrl}')`;
+  lyricDisplay.textContent = 'Pulsa Reproducir para escuchar el fragmento.';
+  questionArea.style.display = 'block';
+  guessInput.value = '';
+  messageArea.textContent = '';
+  state.attempt = 1;
+  triesLeftSpan.textContent = 3;
+  songIndexEl.textContent = `${state.currentIndex+1}/${state.queue.length}`;
+  audioPlayer.src = song.file;
+  audioPlayer.load();
+  playSongBtn.style.display='inline-block';
+}
+
+/* ---------- Play / Countdown ---------- */
+playSongBtn.addEventListener('click', startCountdownAndPlay);
+
+function startCountdownAndPlay(){
+  if(state.countdownPlaying) return;
+  state.countdownPlaying = true;
+  playSongBtn.style.display='none';
+  countdownDiv.style.display='block';
+  // optionally set images; keep simple numeric countdown using text background fallback
+  countdownDiv.style.backgroundImage = `url('number3.png')`;
+  // clear previous
+  state.countdownTimeouts.forEach(t=>clearTimeout(t));
+  state.countdownTimeouts = [];
+
+  const t1 = setTimeout(()=> countdownDiv.style.backgroundImage = `url('number2.png')`, 1000);
+  const t2 = setTimeout(()=> countdownDiv.style.backgroundImage = `url('number1.png')`, 2000);
+  const t3 = setTimeout(()=> {
+    countdownDiv.style.display='none';
+    state.countdownPlaying = false;
+    startSongPlayback(); // begins attempt 1
+  }, 3000);
+
+  state.countdownTimeouts.push(t1,t2,t3);
+}
+
+/* ---------- Song playback by segment ---------- */
+const SEGMENTS = [15, 25, 35]; // seconds per attempt: attempt1->5s, attempt2->10s, attempt3->15s
+
+function startSongPlayback(){
+  // start first segment for current attempt (attempt is already 1 on entry)
+  playSegment(state.attempt);
+}
+
+function playSegment(attempt){
+  clearSegmentTimeout();
+
+  const song = state.queue[state.currentIndex];
+  if(!song) return;
+
+  // compute start time = sum of previous segments
+  const start = SEGMENTS.slice(0, attempt - 1).reduce((a,b)=>a+b, 0);
+  const duration = SEGMENTS[attempt - 1];
+
+  // safety: clamp start/duration to audio length if necessary (we will just attempt to play; if duration exceeds, audio will end)
+  try {
+    audioPlayer.currentTime = start;
+  } catch(e){
+    // some browsers may throw if currentTime set too large; ignore
+  }
+
+  // play
+  audioPlayer.play().catch(()=>{ /* autoplay can be blocked if not user gesture; but play was triggered by user click earlier */ });
+
+  // show UI state
+  lyricDisplay.textContent = `Reproduciendo clip: ${duration}s (attempt ${attempt})`;
+  messageArea.textContent = '';
+  triesLeftSpan.textContent = 4 - attempt; // attempts left after this attempt (for display)
+  questionArea.style.display = 'block';
+  guessInput.focus();
+
+  // schedule pause after duration
+  state.segmentTimeout = setTimeout(()=>{
+    try{ audioPlayer.pause(); } catch(e){}
+    // after the clip stops, allow the user to submit guess (we already show input)
+    lyricDisplay.textContent = 'El vídeo ha terminado -- ahora debes adivinar.';
+  }, duration * 1000);
+}
+
+/* Clear timeouts */
+function clearSegmentTimeout(){
+  if(state.segmentTimeout) { clearTimeout(state.segmentTimeout); state.segmentTimeout = null; }
+}
+function clearCountdownTimeouts(){
+  state.countdownTimeouts.forEach(t=>clearTimeout(t));
+  state.countdownTimeouts = [];
+  state.countdownPlaying = false;
+}
+function clearNextSongTimeout(){
+  if(state.nextSongTimeout){ clearTimeout(state.nextSongTimeout); state.nextSongTimeout = null; }
+}
+function clearTimers(){
+  clearSegmentTimeout();
+  clearCountdownTimeouts();
+  clearNextSongTimeout();
+}
+
+/* ---------- Replay button ---------- */
+replayBtn.addEventListener('click', ()=>{
+  // replay the current attempt's clip
+  playSegment(state.attempt);
+});
+
+/* ---------- Guess handling ---------- */
+guessSubmit.addEventListener('click', checkGuess);
+guessInput.addEventListener('keydown', (e)=>{ if(e.key === 'Enter') checkGuess(); });
+
+function checkGuess(){
+  // user may submit answer even if clip still playing; evaluate based on current attempt
+  const song = state.queue[state.currentIndex];
+  const expected = (song.title || '').trim();
+  const user = guessInput.value.trim();
+  if(user.length === 0){ messageArea.textContent = 'Por favor escribe algo.'; return; }
+
+  if(normalize(expected) === normalize(user)){
+    // correct — award points based on attempt
+    let awarded = 0;
+    if(state.attempt === 1) awarded = 15;
+    else if(state.attempt === 2) awarded = 10;
+    else if(state.attempt === 3) awarded = 5;
+    state.score += awarded;
+    updateScoreboard();
+    messageArea.textContent = `¡Correcto/a! +${awarded} agujas`;
+    currentTitle.textContent = `${song.title} — ${song.artist}`;
+    // stop any clip
+    try{ audioPlayer.pause(); } catch(e){}
+    clearSegmentTimeout();
+
+    // proceed to next song after showing Next Song + 3s countdown
+    startNextSongCountdown();
+  } else {
+    // wrong guess
+    messageArea.textContent = 'Incorrecto/a - intente de nuevo (si los intentos permanecen)';
+    // if there are attempts left, increment attempt and play next clip segment after brief pause
+    if(state.attempt < 3){
+      state.attempt += 1;
+      // replay next segment after 800ms so user sees message
+      clearSegmentTimeout();
+      setTimeout(()=> playSegment(state.attempt), 800);
+      triesLeftSpan.textContent = 4 - state.attempt;
+    } else {
+      // no attempts left -> penalty of -5, reveal title and go to next song
+      state.score -= 5;
+      updateScoreboard();
+      messageArea.textContent = `Sin intentos — canción correcta: "${song.title}" (-5 points)`;
+      currentTitle.textContent = `${song.title} — ${song.artist}`;
+      try{ audioPlayer.pause(); } catch(e){}
+      clearSegmentTimeout();
+      // move to next after short pause
+      startNextSongCountdown();
+    }
+  }
+}
+
+/* Start a 3s 'Next Song' countdown then move on */
+function startNextSongCountdown(){
+  // show a quick countdown in lyricDisplay
+  let c = 3;
+  lyricDisplay.textContent = `Siguiente Canción— ${c}...`;
+  clearNextSongTimeout();
+  state.nextSongTimeout = setInterval(()=>{
+    c--;
+    if(c > 0){
+      lyricDisplay.textContent = `Siguiente canción — ${c}...`;
+    } else {
+      clearNextSongTimeout();
+      // advance
+      onSongFinished();
+    }
+  }, 1000);
+}
+
+/* ---------- Move to next song / end ---------- */
+function onSongFinished(){
+  clearTimers();
+  try{ audioPlayer.pause(); } catch(e){}
+  state.currentIndex += 1;
+  if(state.currentIndex >= state.queue.length){
+    endGame();
+  } else {
+    // reset attempt for next song and show intro
+    state.attempt = 1;
+    showNextSongIntro();
+  }
+}
+
+function endGame(){
+  showFinalScreen();
+  updateScoreboard();
+  const WIN_THRESHOLD = 40; // per your rules
+  if(state.score >= WIN_THRESHOLD){
+    finalTitle.textContent = '¡Ganaste!';
+    finalMessage.textContent = `Tu anotaste ${state.score} — ¡gran trabajo!`;
+  } else {
+    finalTitle.textContent = '¡Perdiste!';
+    finalMessage.textContent = `Tu anotaste ${state.score} — necesitas ${WIN_THRESHOLD - state.score} más para ganar`;
+  }
+}
+
+/* ---------- Utilities ---------- */
+function restartGame(){
+  state.score = 0;
+  state.queue = [];
+  state.currentIndex = 0;
+  state.attempt = 1;
+  clearTimers();
+  try{ audioPlayer.pause(); } catch(e){}
+  pageHeader.textContent = '¡Adivina la Canción!';
+  homeScreen.style.display='flex';
+  chooseScreen.style.display='none';
+  guessScreen.style.display='none';
+  finalScreen.style.display='none';
+  updateScoreboard();
+}
+
+function updateScoreboard(){
+  scoreEl.textContent = state.score;
+  songIndexEl.textContent = `${Math.min(state.currentIndex+1, state.queue.length)}/${state.queue.length || state.totalSongsToPlay}`;
+}
+
+function shuffleArray(a){ for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]];} return a; }
+function normalize(str){ return (str||'').toLowerCase().replace(/[^\w\s]|_/g,'').replace(/\s+/g,' ').trim(); }
+
+}); // end DOMContentLoaded
+</script>
+</body>
+</html>
+
