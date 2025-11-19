@@ -8,7 +8,7 @@ Tech Stack: HTML, CSS, JavaScript
 
 Language Purpose: This project was created as part of my Spanish-learning journey, using music to strengthen vocabulary and recognition skills.
 
-Try it:
+Try it: https://nekelmitchell.github.io/adivina-la-cancion/ 
 
 ![Screenshot](https://github.com/user-attachments/assets/7369e7ed-bb5a-46c8-a7a8-c9a967a2f218)
 
