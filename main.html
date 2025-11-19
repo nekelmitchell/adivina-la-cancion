@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>¡Adivina la Canción!</title>
+ 
+</head>
+<body>
+  <div class="app">
+    <div class="card" role="application" aria-label="Guess The Song game">
+      <div class="scoreboard" id="scoreboard" aria-live="polite">Puntaje: <b id="score">0</b> | <span id="songIndex">0/0</span></div>
+      <header class="app-header" id="pageHeader">¡Adivina la canción!</header>
+      <main class="app-main" id="mainArea">
+        <!-- Home -->
+        <section class="home" id="homeScreen">
+          <div class="hero">
+            <h1 style="color:white;font-size:48px;margin:0;text-shadow:0 8px 24px rgba(0,0,0,0.6)">¡Adivina la canción!</h1>
+            <p style="color:white;opacity:0.95;font-weight:700">¡Escucha con atención! ¡Adivina el nombre correcto de la canción para ganar puntos!</p>
+            <button class="start-btn" id="startBtn">Empezar</button>
+          </div>
+        </section>
+
+        <!-- Choose -->
+        <section class="chooser" id="chooseScreen" style="display:none">
+          <div class="left">
+            <h2 style="margin:0;">Elige una Canción</h2>
+            <p style="margin:0;color:#333">Elige cualquier canción para empezar. Tras seleccionar una, se iniciará una cola de juego de 5 canciones. La primera canción que elijas es un premio gratuito. Necesitas al menos 40 puntos para ganar.</p>
+            <div class="songs-grid" id="songsGrid" aria-label="Available songs">
+              <!-- buttons added by JS -->
+            </div>
+          </div>
+          <div class="right">
+            <div class="preview" id="chooserPreview">Área de vista previa</div>
+          </div>
+        </section>
+
+        <!-- Guess screen -->
+        <section class="guess-screen" id="guessScreen" style="display:none">
+          <div class="bg" id="guessBg"></div>
+          <div class="content" id="guessContent">
+            <h2 id="currentTitle">Canción</h2>
+            <button class="play-btn" id="playSongBtn">Jugar</button>
+
+            <div class="countdown-img" id="countdown" style="display:none"></div>
+
+            <div class="lyrics-box" id="lyricsBox" style="display:block">
+              <div class="lyric-line" id="lyricDisplay">Escucha el fragmento y luego adivina el título de la canción.</div>
+
+              <div id="questionArea" style="display:block">
+                <div style="font-weight:800;margin-top:6px">¿Cuál es la canción?</div>
+                <div class="guess-panel">
+                  <input class="guess-input" id="guessInput" autocomplete="off" placeholder="Type the song title here..."/>
+                  <button class="guess-submit" id="guessSubmit">Entregar</button>
+                  <button class="small-btn" id="replayBtn">Reproducir Clip</button>
+                </div>
+                <div class="message" id="messageArea"></div>
+                <div style="margin-top:6px;font-size:12px;opacity:0.85">Intentos restantes: <span id="triesLeft">3</span></div>
+              </div>
+            </div>
+
+            <audio id="audioPlayer"></audio>
+          </div>
+        </section>
+
+        <!-- Final -->
+        <section class="final" id="finalScreen" style="display:none">
+          <h1 id="finalTitle">¡Ganaste!</h1>
+          <p id="finalMessage">¡Tienes una memoria estupenda y un gusto musical excelente!</p>
+          <button class="start-btn" id="playAgainBtn">Jugar de Nuevo</button>
+        </section>
+      </main>
+
+      <footer class="app-footer">
+        <small style="color:#666">Adivina la canción.</small>
+      </footer>
+    </div>
+  </div>
+
+</body>
+</html>
+
