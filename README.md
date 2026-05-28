@@ -1,12 +1,24 @@
-Adivina La Canción! (Guess the Song)
+# Adivina La Canción! (Guess the Song)🎤
 
 A Spanish-language music guessing game where users listen to a song clip and try to identify the correct title. Built to reinforce Spanish learning through music.
 
-Features: Audio playback of randomized song clips. User input validation. Spanish-based UI for immersive language learning. Feedback for correct/incorrect guesses. Fun replayability with multiple tracks
+## Features
 
-Tech Stack: HTML, CSS, JavaScript
+* Audio playback of randomized song clips.
+* User input validation.
+* Spanish-based UI for immersive language learning.
+* Feedback for correct/incorrect guesses.
+* Fun replayability with multiple tracks.
 
-Language Purpose: This project was created as part of my Spanish-learning journey, using music to strengthen vocabulary and recognition skills.
+## Language Purpose
+
+This project was created as part of my Spanish-learning journey, using music to strengthen vocabulary and recognition skills.
+
+## Built With
+
+* HTML
+* CSS
+* JavaScript
 
 Try it: https://nekelmitchell.github.io/adivina-la-cancion/ 
 
